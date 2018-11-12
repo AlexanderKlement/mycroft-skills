@@ -23,6 +23,7 @@ class TemplateSkill(MycroftSkill):
         
         # Initialize working variables used within the skill.
         self.count = 0
+        self.answer = "";
 
     # The "handle_xxxx_intent" function is triggered by Mycroft when the
     # skill's intent is matched.  The intent is defined by the IntentBuilder()
@@ -58,6 +59,16 @@ class TemplateSkill(MycroftSkill):
     #
     # def stop(self):
     #    return False
+
+    @intent_handler(IntentBuilder("").require("Who").require("Director").require("Movie"))
+    def handle_count_intent(self, message):
+        if(message.data["Movie"] == "Deadpool"):
+            self.answer = "Tim Miller"
+        if(message.data["Movie"] == "Titanic"):
+            self.answer = "James Cameron"
+        if(message.data["Movie"] == "Avatar"):
+            self.answer = "James Cameron"
+        self.speak_dialog("directed.by", data={"director": self.answer})
 
 # The "create_skill()" method is used to create an instance of the skill.
 # Note that it's outside the class itself.
