@@ -8,69 +8,47 @@
 # when the skill gets installed later by a user.
 
 from adapt.intent import IntentBuilder
-from mycroft.skills.core import MycroftSkill, intent_handler
+from mycroft.skills.core import MycroftSkill
 from mycroft.util.log import LOG
+from SPARQLWrapper import SPARQLWrapper, JSON
+from string import Template
 
-# Each skill is contained within its own class, which inherits base methods
-# from the MycroftSkill class.  You extend this class as shown below.
 
-# TODO: Change "Template" to a unique name for your skill
-class TemplateSkill(MycroftSkill):
+class MovieSkill(MycroftSkill):
 
     # The constructor of the skill, which calls MycroftSkill's constructor
     def __init__(self):
-        super(TemplateSkill, self).__init__(name="TemplateSkill")
-        
-        # Initialize working variables used within the skill.
-        self.count = 0
-        self.answer = "";
+        super(MovieSkill, self).__init__(name="TemplateSkill")
+        self.director = "I do not know who directed that"
 
-    # The "handle_xxxx_intent" function is triggered by Mycroft when the
-    # skill's intent is matched.  The intent is defined by the IntentBuilder()
-    # pieces, and is triggered when the user's utterance matches the pattern
-    # defined by the keywords.  In this case, the match occurs when one word
-    # is found from each of the files:
-    #    vocab/en-us/Hello.voc
-    #    vocab/en-us/World.voc
-    # In this example that means it would match on utterances like:
-    #   'Hello world'
-    #   'Howdy you great big world'
-    #   'Greetings planet earth'
-    @intent_handler(IntentBuilder("").require("Hello").require("World"))
-    def handle_hello_world_intent(self, message):
-        # In this case, respond by simply speaking a canned response.
-        # Mycroft will randomly speak one of the lines from the file
-        #    dialogs/en-us/hello.world.dialog
-        self.speak_dialog("hello.world")
+    def initialize(self):
+        director_intent = IntentBuilder("DirectorIntent").require("Who").require("Director").require("Movie").build()
+        self.register_intent(director_intent, self.handle_who_is_director_intent)
 
-    @intent_handler(IntentBuilder("").require("Count").require("Dir"))
-    def handle_count_intent(self, message):
-        if message.data["Dir"] == "up":
-            self.count += 1
-        else:  # assume "down"
-            self.count -= 1
-        self.speak_dialog("count.is.now", data={"count": self.count})
+    def handle_who_is_director_intent(self, message):
 
-    # The "stop" method defines what Mycroft does when told to stop during
-    # the skill's execution. In this case, since the skill's functionality
-    # is extremely simple, there is no need to override it.  If you DO
-    # need to implement stop, you should return True to indicate you handled
-    # it.
-    #
-    # def stop(self):
-    #    return False
-
-    @intent_handler(IntentBuilder("").require("Who").require("Director").require("Movie"))
-    def handle_count_intent(self, message):
-        if(message.data["Movie"] == "Deadpool"):
-            self.answer = "Tim Miller"
-        if(message.data["Movie"] == "Titanic"):
-            self.answer = "James Cameron"
-        if(message.data["Movie"] == "Avatar"):
-            self.answer = "James Cameron"
+        sparql = SPARQLWrapper("http://graphdb.sti2.at:8080/repositories/broker-graph")
+        qt = Template("""
+            PREFIX schema: <http://schema.org/>
+            SELECT *
+            FROM <https://broker.semantify.it/graph/O89n4PteKl/Wc8XrLETTj/latest>
+            WHERE 
+            {
+                ?movie a schema:Movie.
+                ?movie schema:name "$movie_name".
+                ?movie schema:director ?director.
+                ?director schema:name ?name
+            } 
+            """)
+        sparql.setQuery(qt.substitute(movie_name=message.data["Movie"]))
+        sparql.setReturnFormat(JSON)
+        results = sparql.query().convert()
+        for result in results["results"]["bindings"]:
+            self.answer = result["name"]["value"]
         self.speak_dialog("directed.by", data={"director": self.answer})
+
 
 # The "create_skill()" method is used to create an instance of the skill.
 # Note that it's outside the class itself.
 def create_skill():
-    return TemplateSkill()
+    return MovieSkill()
