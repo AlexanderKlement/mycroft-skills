@@ -18,7 +18,7 @@ class MovieSkill(MycroftSkill):
 
     # The constructor of the skill, which calls MycroftSkill's constructor
     def __init__(self):
-        super(MovieSkill, self).__init__(name="TemplateSkill")
+        super(MovieSkill, self).__init__(name="MovieSkill")
         self.director = "I do not know who directed that"
 
     def initialize(self):
@@ -44,8 +44,8 @@ class MovieSkill(MycroftSkill):
         sparql.setReturnFormat(JSON)
         results = sparql.query().convert()
         for result in results["results"]["bindings"]:
-            self.answer = result["name"]["value"]
-        self.speak_dialog("directed.by", data={"director": self.answer})
+            self.director = result["name"]["value"]
+        self.speak_dialog("directed.by", data={"director": self.director})
 
 
 # The "create_skill()" method is used to create an instance of the skill.
