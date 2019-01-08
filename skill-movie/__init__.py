@@ -29,6 +29,7 @@ class MovieSkill(MycroftSkill):
         # TODO delete all the other skills
         self.actor = "I do not know who played in that film"
         self.singer = "I do not know who sang the soundtrack of that movie"
+        self.duration = "I do not know how long that movie is"
 
     def initialize(self):
         director_intent = IntentBuilder("DirectorIntent").require("Who").require("Director").require("Movie").build()
@@ -37,6 +38,9 @@ class MovieSkill(MycroftSkill):
         self.register_intent(actor_intent, self.handle_who_is_actor_intent)
         singer_intent = IntentBuilder("SingerIntent").require("Who").require("Singer").require("Movie").build()
         self.register_intent(singer_intent, self.handle_who_is_singer_intent)
+        duration_intent = IntentBuilder("DurationIntent").require("Who").require("Duration").require("Movie").build()
+        self.register_intent(duration_intent, self.handle_how_long_intent)
+
 
     def handle_who_is_director_intent(self, message):
         results = g.get_directors_by_movie_name(message.data["Movie"])
@@ -56,8 +60,11 @@ class MovieSkill(MycroftSkill):
             self.singer = result["name"]["value"]
         self.speak_dialog("singer.of", data={"singer": self.singer})
 
-
-
+    def handle_how_long_intent(self, message):
+        results = g.get_duration_by_movie_name(message.data["Movie"])
+        for result in results["results"]["bindings"]:
+            self.duration = result["name"]["value"]
+        self.speak_dialog('duration.of', data={'duration': self.duration})
 
 # The "create_skill()" method is used to create an instance of the skill.
 # Note that it's outside the class itself.

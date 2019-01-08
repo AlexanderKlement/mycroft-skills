@@ -1,0 +1,3 @@
+the duration of this movie is {{duration}}
+{{duration}} is the duration of this movie
+This movie is {{duration}} long
