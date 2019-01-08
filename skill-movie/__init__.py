@@ -21,6 +21,10 @@ class MovieSkill(MycroftSkill):
     def __init__(self):
         super(MovieSkill, self).__init__(name="MovieSkill")
         self.director = "I do not know who directed that"
+#TODO sparql query regexp
+#TODO make skill for movie shorter than ?numberOfHours
+#TODO remove double bracchets from dialog files
+#TODO delete all the other skills
         self.actor = "I do not know who played in that film"
         self.singer = "I do not know who sang the soundtrack of that movie"
 
@@ -52,7 +56,7 @@ class MovieSkill(MycroftSkill):
         results = sparql.query().convert()
         for result in results["results"]["bindings"]:
             self.director = result["name"]["value"]
-        self.speak_dialog("directed.by", data={"director": self.director})
+        self.speak_dialog('directedby', {'director': self.director})
 
     def handle_who_is_actor_intent(self, message):
 
