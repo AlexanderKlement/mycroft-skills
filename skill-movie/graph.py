@@ -66,3 +66,23 @@ class Graph:
         sparql.setQuery(qt.substitute(graph_link=GRAPH_LINK))
         sparql.setReturnFormat(JSON)
         return sparql.query().convert()
+
+
+    @staticmethod
+    def get_duration_by_movie_name(movie):
+        sparql = SPARQLWrapper(WRAPPER)
+        qt = Template("""
+                    PREFIX schema: <http://schema.org/>
+                    SELECT *
+                    FROM <"$graph_link">
+                    WHERE 
+                    {
+                        ?movie a schema:Movie.
+                        ?movie schema:name "$movie_name".
+                        ?movie schema:duration ?duration
+                    } 
+                    """)
+        sparql.setQuery(qt.substitute(movie_name=movie))
+        sparql.setQuery(qt.substitute(graph_link=GRAPH_LINK))
+        sparql.setReturnFormat(JSON)
+        return sparql.query().convert()
