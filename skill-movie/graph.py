@@ -3,6 +3,8 @@ from string import Template
 
 WRAPPER = "http://graphdb.sti2.at:8080/repositories/broker-graph"
 GRAPH_LINK = "https://broker.semantify.it/graph/O89n4PteKl/Wc8XrLETTj/latest"
+#newer link:
+#https://broker.semantify.it/graph/O68LFbndcM/WHn3NHFiml/latest
 
 
 class Graph:
