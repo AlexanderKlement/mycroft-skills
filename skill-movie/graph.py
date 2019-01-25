@@ -29,6 +29,7 @@ class Graph:
         sparql.setReturnFormat(JSON)
         return sparql.query().convert()
 
+
     @staticmethod
     def get_actors_by_movie_name(movie):
         sparql = SPARQLWrapper(WRAPPER)
@@ -48,6 +49,7 @@ class Graph:
         sparql.setQuery(qt.substitute(graph_link=GRAPH_LINK))
         sparql.setReturnFormat(JSON)
         return sparql.query().convert()
+
 
     @staticmethod
     def get_singer_by_movie_name(movie):
@@ -109,6 +111,7 @@ class Graph:
         sparql.setReturnFormat(JSON)
         return sparql.query().convert()
 
+
     @staticmethod
     def get_description_by_movie_name(movie):
         sparql = SPARQLWrapper(WRAPPER)
@@ -168,6 +171,48 @@ class Graph:
                     """)
         sparql.setQuery(qt.substitute(movie_name=movie))
         sparql.setQuery(qt.substitute(director_name=director))
+        sparql.setQuery(qt.substitute(graph_link=GRAPH_LINK))
+        sparql.setReturnFormat(JSON)
+        return sparql.query().convert()
+
+
+    @staticmethod
+    def get_producer_by_movie_name(movie):
+        sparql = SPARQLWrapper(WRAPPER)
+        qt = Template("""
+                    PREFIX schema: <http://schema.org/>
+                    SELECT *
+                    FROM <"$graph_link">
+                    WHERE 
+                    {
+                        ?movie a schema:Movie.
+                        ?movie schema:name "$movie_name".
+                        ?movie schema:productionCompany ?productionCompany.
+                        ?productionCompany schema:name ?name
+                    } 
+                    """)
+        sparql.setQuery(qt.substitute(movie_name=movie))
+        sparql.setQuery(qt.substitute(graph_link=GRAPH_LINK))
+        sparql.setReturnFormat(JSON)
+        return sparql.query().convert()
+
+
+    @staticmethod
+    def get_where_was_filmed(movie):
+        sparql = SPARQLWrapper(WRAPPER)
+        qt = Template("""
+                    PREFIX schema: <http://schema.org/>
+                    SELECT *
+                    FROM <"$graph_link">
+                    WHERE 
+                    {
+                        ?movie a schema:Movie.
+                        ?movie schema:name "$movie_name".
+                        ?movie schema:countryOfOrigin ?countryOfOrigin.
+                        ?countryOfOrigin schema:name ?name
+                    } 
+                    """)
+        sparql.setQuery(qt.substitute(movie_name=movie))
         sparql.setQuery(qt.substitute(graph_link=GRAPH_LINK))
         sparql.setReturnFormat(JSON)
         return sparql.query().convert()
