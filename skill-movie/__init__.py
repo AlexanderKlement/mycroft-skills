@@ -53,9 +53,9 @@ class MovieSkill(MycroftSkill):
 		description_intent = IntentBuilder("DescriptionIntent").require("Who").require("Description").require("Movie").build()
 		self.register_intent(description_intent, self.handle_description_intent)
 		producer_intent = IntentBuilder("ProducerIntent").require("Who").require("Producer").require("Movie").build()
-		self.producer_intent(producer_intent, self.handle_who_is_producer)
+		self.register_intent(producer_intent, self.handle_who_is_producer)
 		country_intent = IntentBuilder("CountryIntent").require("Where").require("Movie").require("Producer").build()
-		self.country_intent(producer_intent, self.handle_what_is_country)
+		self.register_intent(producer_intent, self.handle_what_is_country)
 
 	def handle_who_is_director_intent(self, message):
 		results = g.get_directors_by_movie_name(message.data["Movie"])
@@ -115,7 +115,7 @@ class MovieSkill(MycroftSkill):
 			self.producer = result["name"]["value"]
 		self.speak_dialog('producer.of', data={'producer': self.producer})
 
-	def handle_where_was_filmed(self, message):
+	def handle_what_is_country(self, message):
 		results = g.get_producer_by_movie_name(message.data["Movie"])
 		for result in results["results"]["bindings"]:
 			self.producer = result["name"]["value"]
